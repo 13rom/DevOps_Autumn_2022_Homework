@@ -1,59 +1,78 @@
 VAGRANTFILE_API_VERSION = "2"
- 
+
+$sshpass = <<SCRIPT
+# enable ssh password
+  sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config    
+  systemctl restart sshd.service
+SCRIPT
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  
-  config.vm.define "VM1" do |vm1|
-    vm1.vm.box = "ubuntu/focal64"
-    vm1.vm.provider :virtualbox do |vb|
-      vb.name = "VM1-net-gateway"
+  config.vm.define "SRV1" do |srv1|
+    srv1.vm.box = "ubuntu/focal64"
+    srv1.vm.provider :virtualbox do |vb|
+      vb.name = "Server-1"
     end
-    vm1.vm.hostname = "vm1"
+    srv1.vm.hostname = "Server-1"
 
-    vm1.vm.network "private_network", ip: "192.168.12.10",
-      virtualbox__intnet: "isolated"
+    srv1.vm.network "private_network", ip: "10.81.5.1",
+      virtualbox__intnet: "Net2"
+    srv1.vm.network "private_network", ip: "10.8.81.1",
+      virtualbox__intnet: "Net3"
 
-    vm1.vm.provision :shell, path: "bootstrap.sh"
+      srv1.vm.provision :shell, inline: $sshpass
+    # srv1.vm.provision :shell, path: "bootstrap.sh"
 
-    vm1.vm.provision "shell", run: "always", inline: "systemd-resolve --interface enp0s8 --set-dns 192.168.12.10 --set-domain localnet"
-    vm1.vm.provision "shell", run: "always", inline: <<-SHELL
+    # srv1.vm.provision "shell", run: "always", inline: "systemd-resolve --interface enp0s8 --set-dns 192.168.12.10 --set-domain localnet"
+    srv1.vm.provision "shell", run: "always", inline: <<-SHELL
       # enable routing
       sysctl -w net.ipv4.ip_forward=1
-      iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
+      # iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
       # iptables -A FORWARD -i enp0s8 -o enp0s3 -j ACCEPT
       # iptables -A FORWARD -i enp0s3 -o enp0s8 -m state --state RELATED,ESTABLISHED -j ACCEPT
     SHELL
   end
  
 
-  config.vm.define "VM2" do |vm2|
-    vm2.vm.box = "ubuntu/focal64"
-    vm2.vm.provider :virtualbox do |vb|
-      vb.name = "VM2-net-gateway"
+  config.vm.define "CLT1" do |clt1|
+    clt1.vm.box = "ubuntu/focal64"
+    clt1.vm.provider :virtualbox do |vb|
+      vb.name = "Client-1"
     end
-    vm2.vm.hostname = "vm2"
+    clt1.vm.hostname = "Client-1"
 
-    vm2.vm.network "private_network", type: "dhcp", mac: "080027fae675",
-      virtualbox__intnet: "isolated"
+    clt1.vm.network "private_network", ip: "10.81.5.254", mac: "080027fae675",
+      virtualbox__intnet: "Net2"
+    clt1.vm.network "private_network", ip: "172.16.5.1",
+      virtualbox__intnet: "Net4"
+    # clt1.vm.network "private_network", type: "dhcp", mac: "080027fae675",
+    #   virtualbox__intnet: "Net2"
     
-    vm2.vm.provision :shell, path: "bootstrap.sh"
-    #vm2.vm.provision "shell", run: "always", inline: "ip route del default"
-    #vm2.vm.provision "shell", run: "always", inline: "ip route add default via 192.168.12.10"
+    clt1.vm.provision :shell, inline: $sshpass
+    # clt1.vm.provision :shell, path: "bootstrap.sh"
+    #clt1.vm.provision "shell", run: "always", inline: "ip route del default"
+    #clt1.vm.provision "shell", run: "always", inline: "ip route add default via 192.168.12.10"
   end
 
 
-  config.vm.define "VM3" do |vm3|
-    vm3.vm.box = "ubuntu/focal64"
-    vm3.vm.provider :virtualbox do |vb|
-      vb.name = "VM3-net-gateway"
+  config.vm.define "CLT2" do |clt2|
+    clt2.vm.box = "centos/7"
+    clt2.vm.provider :virtualbox do |vb|
+      vb.name = "Client-2"
     end
-    vm3.vm.hostname = "vm3"
+    clt2.vm.hostname = "Client-2"
 
-    vm3.vm.network "private_network", type: "dhcp", mac: "08002752b7e0",
-      virtualbox__intnet: "isolated"
+    clt2.vm.network "private_network", ip: "10.8.81.254", mac: "08002752b7e0",
+      virtualbox__intnet: "Net3"
+    clt2.vm.network "private_network", ip: "172.16.5.254",
+      virtualbox__intnet: "Net4"
+    # clt2.vm.network "private_network", type: "dhcp", mac: "08002752b7e0",
+    #   virtualbox__intnet: "Net3"
 
-    vm3.vm.provision :shell, path: "bootstrap.sh"
-    #vm3.vm.provision "shell", run: "always", inline: "ip route del default"
-    #vm3.vm.provision "shell", run: "always", inline: "ip route add default via 192.168.12.10"
+    clt2.vm.provision :shell, inline: $sshpass
+    # clt2.vm.provision :shell, path: "bootstrap.sh"
+    #clt2.vm.provision "shell", run: "always", inline: "ip route del default"
+    #clt2.vm.provision "shell", run: "always", inline: "ip route add default via 192.168.12.10"
   end
 
 end
