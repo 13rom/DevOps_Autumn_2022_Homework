@@ -6,11 +6,6 @@ $sshpass = <<-SCRIPT
   systemctl restart sshd.service
 SCRIPT
 
-$lointerface = <<-SCRIPT
-  ip addr add 172.17.15.1/24 dev lo
-  ip addr add 172.17.25.1/24 dev lo
-SCRIPT
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  
   config.vm.define "SRV1" do |srv1|
@@ -25,18 +20,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     srv1.vm.network "private_network", ip: "10.8.81.1",
       virtualbox__intnet: "Net3"
 
-      srv1.vm.provision :shell, inline: $sshpass
-    # srv1.vm.provision :shell, path: "bootstrap.sh"
-      srv1.vm.provision "shell", run: "always", inline: "ip route add 172.17.15.0/24 via 10.81.5.254 dev enp0s8"
-
-    # srv1.vm.provision "shell", run: "always", inline: "systemd-resolve --interface enp0s8 --set-dns 192.168.12.10 --set-domain localnet"
-    srv1.vm.provision "shell", run: "always", inline: <<-SHELL
-      # enable routing
-      sysctl -w net.ipv4.ip_forward=1
-      # iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
-      # iptables -A FORWARD -i enp0s8 -o enp0s3 -j ACCEPT
-      # iptables -A FORWARD -i enp0s3 -o enp0s8 -m state --state RELATED,ESTABLISHED -j ACCEPT
-    SHELL
+    srv1.vm.provision :shell, path: "bootstrap.sh"
   end
  
 
@@ -47,18 +31,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     clt1.vm.hostname = "Client-1"
 
-    clt1.vm.network "private_network", ip: "10.81.5.254", mac: "080027fae675",
+    # clt1.vm.network "private_network", ip: "10.81.5.254", mac: "080027fae675",
+    #   virtualbox__intnet: "Net2"
+    clt1.vm.network "private_network", type: "dhcp", mac: "080027fae675",
       virtualbox__intnet: "Net2"
     clt1.vm.network "private_network", ip: "172.16.5.1",
       virtualbox__intnet: "Net4"
-    # clt1.vm.network "private_network", type: "dhcp", mac: "080027fae675",
-    #   virtualbox__intnet: "Net2"
     
-    clt1.vm.provision :shell, inline: $sshpass
-    clt1.vm.provision :shell, inline: $lointerface
-    # clt1.vm.provision :shell, path: "bootstrap.sh"
-    #clt1.vm.provision "shell", run: "always", inline: "ip route del default"
-    clt1.vm.provision "shell", run: "always", inline: "ip route add 10.8.81.0/24 via 10.81.5.1 dev enp0s8"
+    clt1.vm.provision :shell, path: "bootstrap.sh"
+    # clt1.vm.provision :shell, inline: $sshpass
   end
 
 
@@ -69,18 +50,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     clt2.vm.hostname = "Client-2"
 
-    clt2.vm.network "private_network", ip: "10.8.81.254", mac: "08002752b7e0",
+    # clt2.vm.network "private_network", ip: "10.8.81.254", mac: "08002752b7e0",
+    #   virtualbox__intnet: "Net3"
+    clt2.vm.network "private_network", type: "dhcp", mac: "08002752b7e0",
       virtualbox__intnet: "Net3"
     clt2.vm.network "private_network", ip: "172.16.5.254",
       virtualbox__intnet: "Net4"
-    # clt2.vm.network "private_network", type: "dhcp", mac: "08002752b7e0",
-    #   virtualbox__intnet: "Net3"
 
-    clt2.vm.provision :shell, inline: $sshpass
-    # clt2.vm.provision :shell, path: "bootstrap.sh"
-    #clt2.vm.provision "shell", run: "always", inline: "ip route del default"
-    clt2.vm.provision "shell", run: "always", inline: "ip route add 172.17.15.0/24 via 10.8.81.1 dev eth1"
-    clt2.vm.provision "shell", run: "always", inline: "ip route add 172.17.25.0/24 via 172.16.5.1 dev eth2"
+    clt2.vm.provision :shell, path: "bootstrap.sh"
+    # clt2.vm.provision :shell, inline: $sshpass
   end
 
 end

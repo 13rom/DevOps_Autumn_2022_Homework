@@ -1,41 +1,62 @@
 #!/usr/bin/env bash
 
 function PassAuth {
-    # enable VM password authentication 
-    echo "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/pass.conf
+    # enable VM password authentication
+    # echo "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/pass.conf
     # or use:
-    #sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config    
+    sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
     systemctl restart sshd.service
 }
 
 case $HOSTNAME in
 
-    vm1)
-        # enable ssh password
-        PassAuth
+Server-1)
+    # enable ssh password
+    PassAuth
 
-        # install dhcp server
-        apt-get update && apt-get install isc-dhcp-server -y
+    # install dnsmasq
+    apt-get update && apt-get install dnsmasq -y
+    systemctl disable systemd-resolved
+    systemctl stop systemd-resolved
 
-        # install bind9 server
-        apt-get install bind9 -y
+    # configure dnsmasq
+    cp /vagrant/dhcp-dns.conf /etc/dnsmasq.d/dhcp-dns.conf
+    cp /vagrant/hosts /etc/hosts
 
-        # configure dhcp server
-        sed -i 's/INTERFACESv4=""/INTERFACESv4="enp0s8"/g' /etc/default/isc-dhcp-server
-        cp /vagrant/dhcpd.conf /etc/dhcp/dhcpd.conf
+    # start dnsmasq
+    service dnsmasq restart
 
-        # configure dns server
-        cp /vagrant/named.conf.local /etc/bind/named.conf.local
-        cp /vagrant/named.conf.options /etc/bind/named.conf.options
-        cp /vagrant/db.localnet /etc/bind/db.localnet
+    # enable routing and NAT
+    sysctl -w net.ipv4.ip_forward=1
+    iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
+    # iptables -A FORWARD -i enp0s8 -o enp0s3 -j ACCEPT
+    # iptables -A FORWARD -i enp0s3 -o enp0s8 -m state --state RELATED,ESTABLISHED -j ACCEPT
 
-        # start dhcp and dns server
-        service isc-dhcp-server restart
-        service bind9 restart
+    # set route to Client-1 'lo' interface
+    ip route add 172.17.15.0/24 via 10.81.5.254 dev enp0s8
     ;;
 
-    vm2 | vm3)
-        # enable ssh password
-        PassAuth
+Client-1)
+    # enable ssh password
+    PassAuth
+
+    # set 'lo' interface additional addresses
+    ip addr add 172.17.15.1/24 dev lo
+    ip addr add 172.17.25.1/24 dev lo
+
+    # set routing to Client-2 network
+    # need it because Vagrant uses additional NAT interface to communicate with VM
+    ip route add 10.8.81.0/24 via 10.81.5.1 dev enp0s8
+    ;;
+Client-2)
+    # enable ssh password
+    PassAuth
+
+    # set routing to Client-1 .25 network
+    ip route add 172.17.25.0/24 via 172.16.5.1 dev eth2
+
+    # set routing to Client-1 .15 network
+    # need it because Vagrant uses additional NAT interface to communicate with VM
+    ip route add 172.17.15.0/24 via 10.8.81.1 dev eth1
     ;;
 esac
