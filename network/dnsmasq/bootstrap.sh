@@ -34,6 +34,10 @@ Server-1)
 
     # set route to Client-1 'lo' interface
     ip route add 172.17.15.0/24 via 10.81.5.254 dev enp0s8
+
+    # Summarize networks
+    # ip route del 172.17.15.0/24 via 10.81.5.254 dev enp0s8
+    # ip route add 172.17.0.0/19 via 10.81.5.254 dev enp0s8
     ;;
 
 Client-1)
@@ -58,5 +62,10 @@ Client-2)
     # set routing to Client-1 .15 network
     # need it because Vagrant uses additional NAT interface to communicate with VM
     ip route add 172.17.15.0/24 via 10.8.81.1 dev eth1
+
+    # Summarize networks
+    # ip route del 172.17.25.0/24 via 172.16.5.1 dev eth2
+    # ip route del 172.17.15.0/24 via 10.8.81.1 dev eth1
+    # ip route add 172.17.0.0/19 via 10.8.81.1 dev eth1
     ;;
 esac
