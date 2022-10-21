@@ -1,0 +1,4 @@
+zone "localnet" {
+    type master;
+    file "/etc/bind/db.localnet";
+};

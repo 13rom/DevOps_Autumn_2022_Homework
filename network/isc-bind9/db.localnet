@@ -1,0 +1,18 @@
+;
+; BIND data file for localnet
+;
+$TTL	604800
+@	IN	SOA	vm1.localnet. root.vm1.localnet. (
+			      2		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@	IN	NS	vm1.localnet.
+@	IN	A	127.0.0.1
+@	IN	AAAA	::1
+vm1	IN	A	192.168.12.10
+vm2	IN	A	192.168.12.20
+vm3	IN	A	192.168.12.30
+

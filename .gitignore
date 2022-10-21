@@ -1,0 +1,7 @@
+.vagrant/
+destination/
+source/
+log/
+*.tmp
+*.pyc
+__pycache__/

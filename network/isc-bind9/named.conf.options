@@ -1,0 +1,26 @@
+acl "localnet" {
+        192.168.12.0/24;
+        localhost;
+};
+
+options {
+        directory "/var/cache/bind";
+
+        listen-on { "localnet"; };
+
+        forwarders {
+                8.8.8.8;
+                8.8.4.4;
+        };
+
+        recursion yes;
+        allow-recursion { "localnet"; };
+        allow-query { "localnet"; };
+
+        dnssec-validation auto;
+        auth-nxdomain no;
+
+        listen-on-v6 { none; };
+        version "NOT CURRENTLY AVAILABLE";
+        querylog yes;
+};

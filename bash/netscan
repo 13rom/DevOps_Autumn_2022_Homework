@@ -1,0 +1,148 @@
+#!/usr/bin/env bash
+#
+# NAME
+#    netscan - Check network host/port availability
+#
+# SYNOPSIS
+#    netscan --option <target>
+#
+# DESCRIPTION
+#    Scan a given network for available hosts or scan given host for
+#    available ports.
+#
+#    --all
+#           Output every available host ip in a <target> subnet.
+#
+#    --target
+#           Output every opened port on a <target> host IP.
+#
+#    --help
+#           Output this documentation.
+#
+# EXAMPLES
+#    netscan --all 192.168.0.0/24
+#        Find all online hosts in the 192.168.0.0/24 subnet.
+#
+#    netscan --all 192.168.12.107/24
+#        Find all online hosts in the 192.168.12.0/24 subnet.
+#
+#    netscan --target 192.168.0.43
+#        Find all available port on a target host.
+#
+################################################################################
+
+usage() {
+    while IFS= read -r line || [[ -n "$line" ]]
+    do
+        case "$line" in
+            '#!'*) # Shebang line
+                ;;
+            ''|'##'*|[!#]*) # End of Help block
+                exit "${1:-0}"
+                ;;
+            *) # Help line
+                printf '%s\n' "${line:1}"
+                ;;
+        esac
+    done < "$0"
+}
+
+ipvalid() {
+  # Set up local variables
+  local ip=${1:-1.2.3.4}
+  local IFS=.; local -a a=($ip)
+  # Start with a regex format test
+  [[ $ip =~ ^[0-9]+(\.[0-9]+){3}$ ]] || return 1
+  # Test values of quads
+  local quad
+  for quad in {0..3}; do
+    [[ "${a[$quad]}" -gt 255 ]] && return 1
+  done
+  return 0
+}
+
+ip2int() {
+    local a b c d
+    { IFS=. read a b c d; } <<< $1
+    echo $(((((((a << 8) | b) << 8) | c) << 8) | d))
+}
+
+int2ip() {
+    local ui32=$1; shift
+    local ip n
+    for n in 1 2 3 4; do
+        ip=$((ui32 & 0xff))${ip:+.}$ip
+        ui32=$((ui32 >> 8))
+    done
+    echo $ip
+}
+
+# Example: netmask 24 => 255.255.255.0
+netmask() {
+    local mask=$((0xffffffff << (32 - $1))); shift
+    int2ip $mask
+}
+
+# Example: broadcast 192.0.2.0 24 => 192.0.2.255
+broadcast() {
+    local addr=$(ip2int $1); shift
+    local mask=$((0xffffffff << (32 -$1))); shift
+    int2ip $((addr | ~mask))
+}
+
+# Example: network 192.0.2.0 24 => 192.0.2.0
+network() {
+    local addr=$(ip2int $1); shift
+    local mask=$((0xffffffff << (32 -$1))); shift
+    int2ip $((addr & mask))
+}
+
+
+scan-ip() {
+    local firstip=$(network "$1" "$2")
+    local lastip=$(broadcast "$firstip" "$2")
+    #echo "Scan range: $firstip .. $lastip"
+
+    IFS=. read -r f1 f2 f3 f4 <<< "$firstip"
+    IFS=. read -r l1 l2 l3 l4 <<< "$lastip"
+
+    for ip2 in $(seq "$f2" "$l2"); do
+        for ip3 in $(seq "$f3" "$l3"); do
+            for ip4 in $(seq "$f4" "$l4"); do
+                ipaddr="$f1"."$ip2"."$ip3"."$ip4"
+                ping -c1 -t1 -W1 "$ipaddr" &>/dev/null && echo "$ipaddr $(host "$ipaddr" | awk '{ print $5 }')"
+            done
+        done
+    done
+}
+
+scan-port() {
+    for port in {0..65535}; do
+        #(echo >/dev/tcp/${1}/${port}) &>/dev/null && echo "$port opened" #|| echo "$port closed"
+        timeout 1 bash -c "echo >/dev/tcp/${1}/${port}" &>/dev/null && echo "$port opened" 
+    done
+}
+
+
+if [[ $# -lt 2 ]]; then
+    usage 13
+fi
+
+case "$1" in
+    --all)
+        # 192.168.0.0/24
+        IFS=/ read -r scanip scanmask <<< "$2"
+        ipvalid "$scanip" || exit 1
+        [ $scanmask -ge 32 ] || [ $scanmask -le 0 ] && exit 1
+        scan-ip "$scanip" "$scanmask"
+    ;;
+
+    --target)
+        ipvalid "$2" || exit 1
+        scan-port "$2"
+    ;;
+
+    *)
+        usage 13
+    ;;
+esac
