@@ -20,7 +20,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     srv1.vm.network "private_network", ip: "10.8.81.1",
       virtualbox__intnet: "Net3"
 
-    srv1.vm.provision :shell, path: "bootstrap.sh"
+    # srv1.vm.provision :shell, path: "bootstrap.sh"
   end
  
 
@@ -38,7 +38,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     clt1.vm.network "private_network", ip: "172.16.5.1",
       virtualbox__intnet: "Net4"
     
-    clt1.vm.provision :shell, path: "bootstrap.sh"
+    # clt1.vm.provision :shell, path: "bootstrap.sh"
     # clt1.vm.provision :shell, inline: $sshpass
   end
 
@@ -57,8 +57,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     clt2.vm.network "private_network", ip: "172.16.5.254",
       virtualbox__intnet: "Net4"
 
-    clt2.vm.provision :shell, path: "bootstrap.sh"
+    # clt2.vm.provision :shell, path: "bootstrap.sh"
     # clt2.vm.provision :shell, inline: $sshpass
   end
+
+  config.vm.provision :shell, path: "bootstrap.sh"
 
 end
