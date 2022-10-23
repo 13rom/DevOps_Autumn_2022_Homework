@@ -1,4 +1,4 @@
-## Task 4.1 DATABASE ADMINISTRATION
+## DATABASE ADMINISTRATION TASK
 
 ### PART 1 DATABASE BASICS
 
@@ -6,26 +6,23 @@
 
 
 #### MySQL installation
-[`Vagrantfile`](Vagrantfile)
-```
-VAGRANTFILE_API_VERSION = "2"
+Define `MYSQL` virtual machine in [`Vagrantfile`](Vagrantfile)
+```ruby
+config.vm.define "MYSQL" do |mysql|
+    mysql.vm.box = "ubuntu/focal64"
+    mysql.vm.provider :virtualbox do |vb|
+        vb.name = "db-mysql"
+    end
+    mysql.vm.hostname = "mysql-vm"
 
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-
-  config.vm.box = "ubuntu/focal64"
-
-  config.vm.define "db-server" do |db|
-      db.vm.network "private_network", ip: "192.168.12.8"
-      db.vm.network "forwarded_port", guest: 3306, host: 3306
-      db.vm.provision :shell, path: "bootstrap.sh"
-  end
+    mysql.vm.network "private_network", ip: "192.168.56.10"
+    mysql.vm.network "forwarded_port", guest: 3306, host: 3306
+    mysql.vm.provision :shell, path: "bootstrap.sh"
 end
 ```
 
-[`bootstrap.sh`](bootstrap.sh)
-```
-#!/usr/bin/env bash
-
+Provision virtual machine with [`bootstrap.sh`](bootstrap.sh)
+```bash
 # initialize variables
 DBHOST=%
 DBNAME=LAPD
@@ -35,8 +32,8 @@ DBPASSWD=tustan
 #  prepare installation
 apt-get update
 
-debconf-set-selections <<< "mysql-server mysql-server/root_password password $DBPASSWD"
-debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $DBPASSWD"
+debconf-set-selections <<<"mysql-server mysql-server/root_password password $DBPASSWD"
+debconf-set-selections <<<"mysql-server mysql-server/root_password_again password $DBPASSWD"
 
 # install mysql
 apt-get -y install mysql-server mysql-client
@@ -45,57 +42,57 @@ apt-get -y install mysql-server mysql-client
 mysql -uroot -p$DBPASSWD -e "CREATE USER '$DBUSER'@'$DBHOST' IDENTIFIED BY '$DBPASSWD';GRANT ALL ON *.* TO '$DBUSER'@'$DBHOST';FLUSH PRIVILEGES;CREATE DATABASE $DBNAME;"
 
 # update mysql conf file to allow remote access to the db
-sudo sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
+sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
 
-sudo service mysql restart
+service mysql restart
 ```
 
 
 #### Database schema
-```
-    USE LAPD;
-    CREATE TABLE violators (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        full_name VARCHAR(100) NOT NULL,
-        address VARCHAR(100) NOT NULL
-    );
+```SQL
+USE LAPD;
+CREATE TABLE violators (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    full_name VARCHAR(100) NOT NULL,
+    address VARCHAR(100) NOT NULL
+);
 
-    CREATE TABLE officers (
-        badge_num INT PRIMARY KEY UNIQUE,
-        full_name VARCHAR(100) NOT NULL
-    );
+CREATE TABLE officers (
+    badge_num INT PRIMARY KEY UNIQUE,
+    full_name VARCHAR(100) NOT NULL
+);
 
-    CREATE TABLE tickets (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        officers_badge INT NOT NULL,
-        paid BOOLEAN NOT NULL,
-        FOREIGN KEY (officers_badge) REFERENCES officers (badge_num)
-    );
+CREATE TABLE tickets (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    officers_badge INT NOT NULL,
+    paid BOOLEAN NOT NULL,
+    FOREIGN KEY (officers_badge) REFERENCES officers (badge_num)
+);
 
-    CREATE TABLE violations (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        violation_date DATETIME,
-        ticket_id INT NOT NULL,
-        violator_id INT NOT NULL,
-        FOREIGN KEY (ticket_id) REFERENCES tickets (id) ON DELETE CASCADE,
-        FOREIGN KEY (violator_id) REFERENCES violators (id)
-    );
+CREATE TABLE violations (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    violation_date DATETIME,
+    ticket_id INT NOT NULL,
+    violator_id INT NOT NULL,
+    FOREIGN KEY (ticket_id) REFERENCES tickets (id) ON DELETE CASCADE,
+    FOREIGN KEY (violator_id) REFERENCES violators (id)
+);
 
-    CREATE TABLE vehicles(
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        plate_number VARCHAR(100) NOT NULL
-    );
+CREATE TABLE vehicles(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    plate_number VARCHAR(100) NOT NULL
+);
 ```
 
 Correct schema with some DDL commands:
-```
+```SQL
 ALTER TABLE violators ADD phone VARCHAR(20) NOT NULL UNIQUE;
 DROP TABLE vehicles;
 ```
 
 
 #### Tables data
-```
+```SQL
 INSERT INTO officers (badge_num, full_name) VALUES
 ('1000', 'John Doe'),
 ('1001', 'John Walker'),
@@ -126,13 +123,13 @@ INSERT INTO violations (violation_date, ticket_id, violator_id) VALUES
 ```
 
 Make corrections:
-```
+```SQL
 UPDATE tickets SET paid = '0' WHERE id = 4;
 ```
 
 
 #### SQL queries
-```
+```SQL
 USE LAPD;
 SELECT V.id, V.violation_date AS 'Date', Vr.full_name AS Violator, O.full_name AS Punisher
 FROM violations AS V
@@ -149,13 +146,13 @@ DELETE FROM tickets WHERE officers_badge = '2000';
 
 #### User database
 Create users:
-```
+```SQL
 CREATE USER 'police_officer'@'localhost' IDENTIFIED WITH mysql_native_password BY 'robocop';
 CREATE USER 'police_chief'@'localhost' IDENTIFIED WITH mysql_native_password BY 'robochief';
 ```
 
 Give permissions:
-```
+```SQL
 GRANT CREATE, DROP, DELETE, INSERT, SELECT, UPDATE on LAPD.tickets TO 'police_officer'@'localhost';
 SHOW GRANTS FOR 'police_officer'@'localhost';
 GRANT ALL PRIVILEGES on LAPD.* TO 'police_chief'@'localhost';
@@ -163,30 +160,30 @@ SHOW GRANTS FOR 'police_chief'@'localhost';
 ```
 
 Correct the mistake:
-```
+```SQL
 REVOKE CREATE, DROP, DELETE on LAPD.tickets FROM 'police_officer'@'localhost';
 SHOW GRANTS FOR 'police_officer'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
 Test the permissions:
-```
+```bash
 mysql -uroot -p -e "SELECT user,authentication_string,plugin,host FROM mysql.user WHERE user LIKE 'police_%';"
 ```
 Police officer has the permission to select data from `tickets` table:
-```
+```bash
 mysql -upolice_officer -p -e "SELECT * FROM LAPD.tickets;"
 ```
 But doesn't have one for any other:
-```
+```bash
 mysql -upolice_officer -p -e "SELECT * FROM LAPD.violations;"
 ```
 Police department chief does have all the permissions for `LAPD` database:
-```
+```bash
 mysql -upolice_chief -p -e "SELECT * FROM LAPD.violations;"
 ```
 But can't even select data from other databases:
-```
+```bash
 mysql -upolice_chief -p -e "SELECT * FROM mysql.user;"
 
 ```
@@ -194,7 +191,7 @@ mysql -upolice_chief -p -e "SELECT * FROM mysql.user;"
 ![SQL queries](screenshots/SQL-queries.png)
 
 #### Main DB tables
-```
+```SQL
 USE mysql;
 SHOW databases;
 SHOW tables;
@@ -205,35 +202,35 @@ SELECT * FROM db;
 
 #### Database backup
 
-```
+```bash
 mysqldump -uroot -p LAPD > /vagrant/LAPD_base.sql
 ```
 
 Corrupt the database:
-```
+```bash
 mysql -uroot -p -e "DROP table LAPD.violations;"
 mysql -uroot -p -e "SHOW TABLES IN LAPD;"
 ```
 Restore the database:
-```
+```bash
 mysql -uroot -p LAPD < /vagrant/LAPD_base.sql
 mysql -uroot -p -e "SHOW TABLES IN LAPD;"
 ```
 
 Make a check:
-```
+```bash
 mysql -upolice_chief -p -e "SELECT * FROM LAPD.violations ORDER BY violation_date DESC;"
 ```
 
 
 #### AWS RDS
 Move local database to a newly created RDS MySQL (`dbplayground`):
-```
+```bash
 mysql -uuser -p -h dbplayground.c25irogbj3nw.eu-central-1.rds.amazonaws.com LAPD < /vagrant/LAPD_base.sql
 ```
 
 Connect to `dbplayground`:
-```
+```bash
 mysql -uuser -p -h dbplayground.c25irogbj3nw.eu-central-1.rds.amazonaws.com
 ```
 ![AWS RDS LAPD DB](screenshots/AWSRDS.png)
@@ -243,6 +240,111 @@ Make a dump:
 mysqldump -uuser -p -h dbplayground.c25irogbj3nw.eu-central-1.rds.amazonaws.com LAPD > /vagrant/dbplayground-LAPD.sql
 ```
 
-### PART 3 DYNAMODB
-![Amazon DynamoDB](screenshots/SteveJobs.png)
+### PART 3 MONGODB
+
+#### MongoDB installation
+Define `MONGO` virtual machine in [`Vagrantfile`](Vagrantfile)
+```ruby
+  config.vm.define "MONGO" do |mongo|
+    mongo.vm.box = "ubuntu/focal64"
+    mongo.vm.provider :virtualbox do |vb|
+      vb.name = "db-mongo"
+    end
+    mongo.vm.hostname = "mongo-vm"
+
+    mongo.vm.network "private_network", ip: "192.168.56.20"
+    mongo.vm.network "forwarded_port", guest: 27017, host: 27017
+    mongo.vm.provision :shell, path: "bootstrap.sh"
+  end
+```
+
+Provision virtual machine with [`bootstrap.sh`](bootstrap.sh)
+```bash
+# prepare installation
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+apt-get update
+
+# install mongodb
+apt-get install -y mongodb-org net-tools
+
+# fix ubuntu 20.04 permissions problem
+chown -R mongodb:mongodb /var/lib/mongodb
+chown mongodb:mongodb /tmp/mongodb-27017.sock
+
+# start mongod
+service mongod restart
+
+sleep 20
+
+# query the database
+mongosh < /vagrant/mongo_base.js
+```
+
+Prepare a query script [`mongo_base.js`](mongo_base.js)
+```js
+use world;
+db.createCollection("countries");
+show databases;
+show collections;
+db.countries.insertOne({
+	name: "Ukraine",
+	rating: 85
+});
+db.countries.insertMany([
+	{name: "Belgium", rating: 83},
+	{name: "Germany", rating: 46},
+	{name: "Canada", rating: 2}
+]);
+db.countries.find();
+```
+
+
+#### MongoDB query result
+```console
+$ vagrant up MONGO
+<...>
+MONGO: test> switched to db world
+MONGO: world> { ok: 1 }
+MONGO: world> admin   40.00 KiB
+MONGO: config  12.00 KiB
+MONGO: local   40.00 KiB
+MONGO: world    8.00 KiB
+MONGO: world> countries
+MONGO: world> ... ... ... {
+MONGO:   acknowledged: true,
+MONGO:   insertedId: ObjectId("635541b7ef74f0200f645808")
+MONGO: }
+MONGO: world> ... ... ... ... {
+MONGO:   acknowledged: true,
+MONGO:   insertedIds: {
+MONGO:     '0': ObjectId("635541b7ef74f0200f645809"),
+MONGO:     '1': ObjectId("635541b7ef74f0200f64580a"),
+MONGO:     '2': ObjectId("635541b7ef74f0200f64580b")
+MONGO:   }
+MONGO: }
+MONGO: world> [
+MONGO:   {
+MONGO:     _id: ObjectId("635541b7ef74f0200f645808"),
+MONGO:     name: 'Ukraine',
+MONGO:     rating: 85
+MONGO:   },
+MONGO:   {
+MONGO:     _id: ObjectId("635541b7ef74f0200f645809"),
+MONGO:     name: 'Belgium',
+MONGO:     rating: 83
+MONGO:   },
+MONGO:   {
+MONGO:     _id: ObjectId("635541b7ef74f0200f64580a"),
+MONGO:     name: 'Germany',
+MONGO:     rating: 46
+MONGO:   },
+MONGO:   {
+MONGO:     _id: ObjectId("635541b7ef74f0200f64580b"),
+MONGO:     name: 'Canada',
+MONGO:     rating: 2
+MONGO:   }
+MONGO: ]
+```
 
