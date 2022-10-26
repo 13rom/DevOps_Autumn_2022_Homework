@@ -7,7 +7,7 @@
 1.&nbsp;The lab is built using [`Vagrantfile`](dnsmasq/Vagrantfile). Three virtual machines are provisioned:
 
 | | Server-1 | Client-1 | Client-2 |
-|-|----------|----------|----------|
+| ---: | :---: | :---: | :---: |
 | OS | ubuntu/focal64 | ubuntu/focal64 | centos/7 |
 | Net2 | enp0s8 (static 10.81.5.1) | enp0s8 (dhcp 10.81.5.254) | -- |
 | Net3 | enp0s9 (static 10.8.81.1) | -- | enp0s8 (dhcp 10.8.81.254) |
@@ -31,10 +31,6 @@ cp /vagrant/hosts /etc/hosts
 
 # start dnsmasq
 service dnsmasq restart
-
-# enable routing and NAT
-sysctl -w net.ipv4.ip_forward=1
-iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
 <...>
 ```
 
