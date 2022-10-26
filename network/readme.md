@@ -6,11 +6,12 @@
 
 The lab is built using [`Vagrantfile`](dnsmasq/Vagrantfile). Three virtual machines are provisioned:
 
-| | OS | Net2 | Net3 | Net4 |
-|---|---|---|---|---|
-| **Server-1** | ubuntu/focal64 | enp0s8 (static 10.81.5.1) | enp0s9 (static 10.8.81.1) | -- |
-| **Client-1** | ubuntu/focal64 | enp0s8 (dhcp 10.81.5.254) | -- | enp0s9 (static 172.16.5.1) |
-| **Client-2** | centos/7 | -- | enp0s8 (dhcp 10.8.81.254) | enp0s9 (static 172.16.5.254) |
+| | Server-1 | Client-1 | Client-2 |
+|-|----------|----------|----------|
+| OS | ubuntu/focal64 | ubuntu/focal64 | centos/7 |
+| Net2 | enp0s8 (static 10.81.5.1) | enp0s8 (dhcp 10.81.5.254) | -- |
+| Net3 | enp0s9 (static 10.8.81.1) | -- | enp0s8 (dhcp 10.8.81.254) |
+| Net4 | -- | enp0s9 (static 172.16.5.1) | enp0s9 (static 172.16.5.254) |
 
 
 ### DNSMASQ DHCP + DNSMASQ DNS server
