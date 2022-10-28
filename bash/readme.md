@@ -1,4 +1,4 @@
-## Task 7.1
+## LINUX BASH TASK
 
 ### Part A
 Create a script that uses the following keys:
@@ -69,6 +69,8 @@ The code that performs the functionality of each of the subtasks must be placed 
 
 
 ----
+Two versions of the script were created: [`netscan`](netscan) and [`netscan-ng`](netscan-ng) - the shorter and faster version with parallel scanning.
+
 [`netscan`](netscan):
 
 ```bash
