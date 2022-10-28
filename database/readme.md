@@ -6,7 +6,7 @@
 
 
 #### MySQL installation
-Define `MYSQL` virtual machine in [`Vagrantfile`](Vagrantfile)
+Define **MYSQL** virtual machine in [`Vagrantfile`](Vagrantfile)
 ```ruby
 config.vm.define "MYSQL" do |mysql|
     mysql.vm.box = "ubuntu/focal64"
@@ -116,7 +116,7 @@ INSERT INTO tickets (officers_badge, paid) VALUES
 
 INSERT INTO violations (violation_date, ticket_id, violator_id) VALUES
 ('2021-12-20 18:00:02', '1', '3'),
-('2021-12-20 18:01:02', '2', '3'),
+('2022-12-20 18:01:02', '2', '3'),
 ('2021-12-20 18:02:02', '3', '3'),
 ('1984-04-02 02:05:15', '4', '5'),
 ('2001-11-04 16:16:16', '5', '1');
@@ -243,7 +243,7 @@ mysqldump -uuser -p -h dbplayground.c25irogbj3nw.eu-central-1.rds.amazonaws.com 
 ### PART 3 MONGODB
 
 #### MongoDB installation
-Define `MONGO` virtual machine in [`Vagrantfile`](Vagrantfile)
+Define **MONGO** virtual machine in [`Vagrantfile`](Vagrantfile)
 ```ruby
   config.vm.define "MONGO" do |mongo|
     mongo.vm.box = "ubuntu/focal64"
