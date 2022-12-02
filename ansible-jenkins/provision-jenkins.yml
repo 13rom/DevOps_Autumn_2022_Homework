@@ -1,0 +1,31 @@
+---
+- name: Deploy Jenkins Server
+  hosts: jenkins
+
+  vars:
+    jenkins_admin_password: tustan
+    java_packages: java-11-amazon-corretto-headless
+    ansible_install_method: pip
+    ansible_python_interpreter: /usr/bin/python3.7
+    firewall_allowed_tcp_ports:
+      - "22"
+      - "80"
+      - "8080"
+    jenkins_plugins:
+      - ansicolor
+      - publish-over-ssh
+      - git
+      - github
+      - workflow-aggregator
+      - credentials
+      - pipeline-stage-view
+
+
+  roles:
+    - geerlingguy.firewall
+    - geerlingguy.pip
+    - geerlingguy.ansible
+    - andrewrothstein.terraform
+    - geerlingguy.git
+    - geerlingguy.java
+    - geerlingguy.jenkins
