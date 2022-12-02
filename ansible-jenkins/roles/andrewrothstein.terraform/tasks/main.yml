@@ -1,0 +1,9 @@
+---
+- name: installing terraform binaries
+  include_role:
+    name: andrewrothstein.hashi
+  vars:
+    hashi_apps:
+      - name: '{{ terraform_app.name | default("terraform") }}'
+        ver: '{{ terraform_app.ver | default(terraform_ver) }}'
+        meta: '{{ terraform_app.meta | default("") }}'
