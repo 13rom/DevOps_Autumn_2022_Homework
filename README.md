@@ -10,3 +10,8 @@ mkdir -p terraform-jenkins/modules/{compute,security_group,vpc} && cd terraform-
 ```bash
 ansible-galaxy install -r requirements.yml -p ./roles/
 ```
+
+## Add github to jenkins known hosts
+```bash
+jenkins@jenkins:~$ ssh-keyscan github.com >> ~/.ssh/known_hosts
+```

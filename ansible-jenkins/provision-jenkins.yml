@@ -29,3 +29,22 @@
     - geerlingguy.git
     - geerlingguy.java
     - geerlingguy.jenkins
+  
+  tasks:
+    - name: Set server hostname
+      ansible.builtin.hostname:
+        name: jenkins
+        
+    - name: Enable jenkins user with SSH
+      ansible.builtin.user:
+        name: jenkins
+        shell: /bin/bash
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_type: rsa
+        ssh_key_file: .ssh/jenkins_server_id_rsa
+      register: ssh_public_key
+    
+    - name: Print Jenkins Server public SSH key
+      debug:
+        msg: "{{ ssh_public_key  }}"
