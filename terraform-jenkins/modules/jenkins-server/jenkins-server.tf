@@ -4,6 +4,9 @@ variable "my_ip" {}
 variable "subnet_id" {}
 variable "ec2_instance_type" {}
 
+variable "project_name" {}
+variable "env" {}
+
 
 data "aws_ami" "amazon_linux" {
   most_recent = true
@@ -56,7 +59,7 @@ resource "aws_security_group" "jenkins_security_group" {
   }
 
   tags = {
-    Name = "Jenkins-Security-Group"
+    Name = "${var.env}-${var.project_name}-Security-Group"
   }
 }
 
@@ -74,7 +77,7 @@ resource "aws_instance" "jenkins_instance" {
   vpc_security_group_ids = [aws_security_group.jenkins_security_group.id]
 
   tags = {
-    Name = "Jenkins-Server-Instance"
+    Name = "${var.env}-${var.project_name}-Server-Instance"
   }
 
 }

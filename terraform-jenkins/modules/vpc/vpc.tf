@@ -6,6 +6,9 @@ variable "vpc_cidr_block" {}
 variable "public_subnet_cidr_block" {}
 variable "my_ip" {}
 
+variable "project_name" {}
+variable "env" {}
+
 
 resource "aws_vpc" "jenkins_vpc" {
   cidr_block           = var.vpc_cidr_block
@@ -13,7 +16,7 @@ resource "aws_vpc" "jenkins_vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "Jenkins-VPC"
+    Name = "${var.env}-${var.project_name}-VPC"
   }
 }
 
@@ -24,7 +27,7 @@ resource "aws_subnet" "jenkins_public_subnet" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "Jenkins-Public-Subnet"
+    Name = "${var.env}-${var.project_name}-Public-Subnet"
   }
 }
 
@@ -32,7 +35,7 @@ resource "aws_internet_gateway" "jenkins_igw" {
   vpc_id = aws_vpc.jenkins_vpc.id
 
   tags = {
-    Name = "Jenkins-Gateway"
+    Name = "${var.env}-${var.project_name}-Gateway"
   }
 }
 
@@ -40,7 +43,7 @@ resource "aws_route_table" "jenkins_public_rt" {
   vpc_id = aws_vpc.jenkins_vpc.id
 
   tags = {
-    Name = "Jenkins-Route-Table"
+    Name = "${var.env}-${var.project_name}-Route-Table"
   }
 
   route {

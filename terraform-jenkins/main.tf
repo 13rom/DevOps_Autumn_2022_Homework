@@ -13,14 +13,20 @@ module "network" {
   vpc_cidr_block           = var.vpc_cidr_block
   public_subnet_cidr_block = var.public_subnet_cidr_block
   my_ip                    = var.my_ip
+
+  project_name = var.project_name
+  env          = var.env
 }
 
 module "jenkins_server" {
   source            = "./modules/jenkins-server"
-  my_ip             = var.my_ip
-  public_key        = var.public_key
+  ec2_instance_type = var.ec2_instance_type
   vpc_id            = module.network.vpc-id
   subnet_id         = module.network.public-subnet-id
-  ec2_instance_type = var.ec2_instance_type
+  my_ip             = var.my_ip
+  public_key        = var.public_key
+
+  project_name = var.project_name
+  env          = var.env
 }
 

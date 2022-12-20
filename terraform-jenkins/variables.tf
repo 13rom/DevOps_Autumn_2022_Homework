@@ -38,3 +38,15 @@ variable "ec2_instance_type" {
   type        = string
   default     = "t2.micro"
 }
+
+variable "project_name" {
+  description = "Project Name"
+  type        = string
+  default     = "Jenkins"
+}
+
+variable "env" {
+  description = "Environment type"
+  type        = string
+  default     = "dev"
+}
