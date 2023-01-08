@@ -1,8 +1,21 @@
 ADDRESS := $(shell terraform output -raw aws-jenkins-instance-public-dns)
 ANSIBLE_DIR := ../ansible-jenkins
+BACKEND_DIR := ../terraform-backend
 
-all : plan apply show-dns connect ping roles-install provision
-.PHONY : all
+everything : backend-init backend-plan backend-apply plan apply show-dns connect ping roles-install provision
+.PHONY : everything
+
+backend-init:
+	cd ${BACKEND_DIR}; \
+	terraform init
+
+backend-plan:
+	cd ${BACKEND_DIR}; \
+	terraform plan
+
+backend-apply:
+	cd ${BACKEND_DIR}; \
+	terraform apply
 
 plan:
 	terraform plan
