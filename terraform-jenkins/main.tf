@@ -3,6 +3,15 @@ provider "aws" {
   profile = "jenkins"
 }
 
+terraform {
+  backend "s3" {
+    bucket  = "terraform-state-mirom-jenkins-dev"
+    key     = "terraform-jenkins/terraform.tfstate"
+    region  = "eu-central-1"
+    encrypt = true
+    profile = "jenkins"
+  }
+}
 
 data "aws_availability_zones" "current" {}
 data "aws_region" "current" {}
