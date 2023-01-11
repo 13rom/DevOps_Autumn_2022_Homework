@@ -1,8 +1,26 @@
+# Terraform Jenkins server deployment
+#
+#
+# Tutorial:
+# https://www.freecodecamp.org/news/learn-terraform-by-deploying-jenkins-server-on-aws/
+# https://github.com/Caesarsage/terraform-jenkins-instance/blob/main/development/main.tf
+#
+#
+#
+# TODO: Make AMI selection to depend on var.env
+# TODO: Make VPC module to create given number of subnets
+# TODO: Make jenkins-server module to deploy given number of agent nodes
+# TODO: Implement a DynamoDB table lock to prevent simultaneous writing - https://technology.doximity.com/articles/terraform-s3-backend-best-practices
+# TODO: Automate Jenkins master initial jobs deployment
+# TODO: Run ansible from terraform
+# TODO: Add iam_instance_profile to jenkins master instance
+
 provider "aws" {
   region  = var.aws_region
   profile = "jenkins"
 }
 
+# TODO: Automate this block
 terraform {
   backend "s3" {
     bucket  = "terraform-state-mirom-jenkins-dev"
