@@ -16,8 +16,9 @@ ansible-galaxy install -r requirements.yml -p ./roles/
 jenkins@jenkins:~$ ssh-keyscan github.com >> ~/.ssh/known_hosts
 ```
 
-## Assign a role to jenkins instance
-[Deploy Jenkins server in AWS using Terraform , IAC tool](https://www.youtube.com/watch?v=Qlj-xGx9hHg)
+## Tutorials
+[Assign a role to jenkins instance](https://www.youtube.com/watch?v=Qlj-xGx9hHg)
+[Add slaves with plugin](https://faun.pub/10-steps-to-deploy-and-configure-jenkins-on-aws-with-terraform-26e641e90ae)
 
 
 Plan:
