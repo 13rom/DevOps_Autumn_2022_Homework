@@ -5,7 +5,7 @@ output "aws-amazon-linux-ami" {
 
 output "aws-jenkins-security-group-id" {
   description = "Jenkins security group ID"
-  value       = aws_security_group.jenkins_security_group.id
+  value       = aws_security_group.jenkins_master_sg.id
 }
 
 output "aws-jenkins-instance-public-ip" {
