@@ -6,6 +6,9 @@ variable "ec2_instance_type" {}
 
 variable "project_name" {}
 variable "env" {}
+variable "tags" {
+  type = map(string)
+}
 
 
 data "aws_ami" "amazon_linux" {
@@ -58,9 +61,9 @@ resource "aws_security_group" "jenkins_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "${var.env}-${var.project_name}-Security-Group"
-  }
+  tags = merge(var.tags, tomap({
+    "Name" = "${var.project_name}-master-sg-${var.env}"
+  }))
 }
 
 resource "aws_key_pair" "jenkins_ssh_key" {
@@ -76,8 +79,9 @@ resource "aws_instance" "jenkins_instance" {
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.jenkins_security_group.id]
 
-  tags = {
-    Name = "${var.env}-${var.project_name}-Server-Instance"
-  }
+  tags = merge(var.tags, tomap({
+    "Name"        = "${var.project_name}-master-ec2-${var.env}",
+    "Environment" = var.env
+  }))
 
 }

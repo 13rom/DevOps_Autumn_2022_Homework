@@ -43,6 +43,7 @@ module "network" {
 
   project_name = var.project_name
   env          = var.env
+  tags         = var.tags
 }
 
 module "jenkins_server" {
@@ -55,5 +56,6 @@ module "jenkins_server" {
 
   project_name = var.project_name
   env          = var.env
+  tags         = var.tags
 }
 

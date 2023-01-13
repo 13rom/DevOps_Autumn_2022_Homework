@@ -8,6 +8,9 @@ variable "my_ip" {}
 
 variable "project_name" {}
 variable "env" {}
+variable "tags" {
+  type = map(string)
+}
 
 
 resource "aws_vpc" "jenkins_vpc" {
@@ -15,9 +18,10 @@ resource "aws_vpc" "jenkins_vpc" {
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags = {
-    Name = "${var.env}-${var.project_name}-VPC"
-  }
+  tags = merge(var.tags, tomap({
+    "Name"        = "${var.project_name}-vpc-${var.env}",
+    "Environment" = var.env
+  }))
 }
 
 resource "aws_subnet" "jenkins_public_subnet" {
@@ -26,25 +30,28 @@ resource "aws_subnet" "jenkins_public_subnet" {
   availability_zone       = data.aws_availability_zones.current.names[0]
   map_public_ip_on_launch = true
 
-  tags = {
-    Name = "${var.env}-${var.project_name}-Public-Subnet"
-  }
+  tags = merge(var.tags, tomap({
+    "Name"        = "${var.project_name}-public-subnet-${var.env}",
+    "Environment" = var.env
+  }))
 }
 
 resource "aws_internet_gateway" "jenkins_igw" {
   vpc_id = aws_vpc.jenkins_vpc.id
 
-  tags = {
-    Name = "${var.env}-${var.project_name}-Gateway"
-  }
+  tags = merge(var.tags, tomap({
+    "Name"        = "${var.project_name}-gw-${var.env}",
+    "Environment" = var.env
+  }))
 }
 
 resource "aws_route_table" "jenkins_public_rt" {
   vpc_id = aws_vpc.jenkins_vpc.id
 
-  tags = {
-    Name = "${var.env}-${var.project_name}-Route-Table"
-  }
+  tags = merge(var.tags, tomap({
+    "Name"        = "${var.project_name}-rt-${var.env}",
+    "Environment" = var.env
+  }))
 
   route {
     cidr_block = var.my_ip

@@ -48,3 +48,12 @@ variable "env" {
   type        = string
   default     = "dev"
 }
+
+variable "tags" {
+  description = "Tags to apply to all the resources"
+  type        = map(string)
+
+  default = {
+    Terraform = "true"
+  }
+}
