@@ -37,7 +37,7 @@ Create a script that uses the following keys:
             Find all available port on a target host.
     ```
 
-2. The --all key displays the IP addresses and symbolic names of all hosts in the current subnet
+2. The *--all* key displays the IP addresses and symbolic names of all hosts in the current subnet
 
     ```console
     $ ./netscan --all 192.168.1.0/24
@@ -50,7 +50,7 @@ Create a script that uses the following keys:
     192.168.1.132 3(NXDOMAIN)
     ```
 
-3. The --target key displays a list of open system TCP ports.
+3. The *--target* key displays a list of open system TCP ports.
 The code that performs the functionality of each of the subtasks must be placed in a separate function
 
     ```console
