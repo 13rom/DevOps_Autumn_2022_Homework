@@ -1,13 +1,13 @@
 # EPAM Cloud&DevOps Fundamentals Autumn 2022
 ## Homework
 
-* [Linux & bash](bash/readme.md)
+* [Linux & bash](bash/)
 
-* [Database administration](database/readme.md)
+* [Database administration](database/)
 
-* [Networks Using Linux](network/readme.md)
+* [Networks Using Linux](network/)
 
-* [Virtualization and Cloud Basic (AWS)](cloud/readme.md)
+* [Virtualization and Cloud Basic (AWS)](cloud/)
 
 ## Final project
 
