@@ -20,23 +20,45 @@ output "aws-jenkins-public-subnet-id" {
 }
 
 
-# Jenkins Server
-output "aws-amazon-linux-ami" {
+# Jenkins Master
+output "aws-jenkins-master-ami" {
   description = "Amazon Linux 2 AMI"
-  value       = module.jenkins_server.aws-amazon-linux-ami.description
+  value       = module.jenkins_master.aws-amazon-linux-ami.description
 }
 
-output "aws-jenkins-security-group-id" {
+output "aws-jenkins-master-security-group-id" {
   description = "Jenkins security group ID"
-  value       = module.jenkins_server.aws-jenkins-security-group-id
+  value       = module.jenkins_master.aws-security-group-id
 }
 
-output "aws-jenkins-instance-public-ip" {
+output "aws-jenkins-master-instance-public-ip" {
   description = "Jenkins Server Instance Public IP"
-  value       = module.jenkins_server.aws-jenkins-instance-public-ip
+  value       = module.jenkins_master.aws-instance-public-ip
 }
 
-output "aws-jenkins-instance-public-dns" {
+output "aws-jenkins-master-instance-public-dns" {
   description = "Jenkins Server Instance Public DNS name"
-  value       = module.jenkins_server.aws-jenkins-instance-public-dns
+  value       = module.jenkins_master.aws-instance-public-dns
+}
+
+
+# Jenkins Slave
+output "aws-jenkins-slave-ami" {
+  description = "Amazon Linux 2 AMI"
+  value       = module.jenkins_slave.aws-amazon-linux-ami.description
+}
+
+output "aws-jenkins-slave-security-group-id" {
+  description = "Jenkins security group ID"
+  value       = module.jenkins_slave.aws-security-group-id
+}
+
+output "aws-jenkins-slave-instance-public-ip" {
+  description = "Jenkins Server Instance Public IP"
+  value       = module.jenkins_slave.aws-instance-public-ip
+}
+
+output "aws-jenkins-slave-instance-public-dns" {
+  description = "Jenkins Server Instance Public DNS name"
+  value       = module.jenkins_slave.aws-instance-public-dns
 }

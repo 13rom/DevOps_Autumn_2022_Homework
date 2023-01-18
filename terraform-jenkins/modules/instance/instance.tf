@@ -1,9 +1,9 @@
-variable "vpc_id" {}
-variable "public_key" {}
-variable "my_ip" {}
+variable "key_name" {}
 variable "subnet_id" {}
+variable "vpc_security_group_ids" {}
 variable "ec2_instance_type" {}
 
+variable "name" {}
 variable "project_name" {}
 variable "env" {}
 variable "tags" {
@@ -21,21 +21,16 @@ data "aws_ami" "amazon_linux" {
   }
 }
 
-resource "aws_key_pair" "jenkins_ssh_key" {
-  key_name   = "jenkins-ssh-key"
-  public_key = var.public_key
-}
-
 resource "aws_instance" "jenkins_instance" {
   ami           = data.aws_ami.amazon_linux.id
   instance_type = var.ec2_instance_type
 
-  key_name               = aws_key_pair.jenkins_ssh_key.key_name
+  key_name               = var.key_name
   subnet_id              = var.subnet_id
-  vpc_security_group_ids = [aws_security_group.jenkins_master_sg.id]
+  vpc_security_group_ids = var.vpc_security_group_ids
 
   tags = merge(var.tags, tomap({
-    "Name"        = "${var.project_name}-master-ec2-${var.env}",
+    "Name"        = "${var.project_name}-${var.name}-ec2-${var.env}",
     "Environment" = var.env
   }))
 

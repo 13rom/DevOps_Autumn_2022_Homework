@@ -46,14 +46,32 @@ module "network" {
   tags         = var.tags
 }
 
-module "jenkins_server" {
-  source            = "./modules/jenkins-server"
-  ec2_instance_type = var.ec2_instance_type
-  vpc_id            = module.network.vpc-id
-  subnet_id         = module.network.public-subnet-id
-  my_ip             = var.my_ip
-  public_key        = var.public_key
+resource "aws_key_pair" "jenkins_ssh_key" {
+  key_name   = "jenkins-ssh-key"
+  public_key = var.public_key
+}
 
+module "jenkins_master" {
+  source                 = "./modules/instance"
+  ec2_instance_type      = var.ec2_instance_type
+  subnet_id              = module.network.public-subnet-id
+  vpc_security_group_ids = [module.network.master-sg-id]
+  key_name               = aws_key_pair.jenkins_ssh_key.key_name
+
+  name         = "master"
+  project_name = var.project_name
+  env          = var.env
+  tags         = var.tags
+}
+
+module "jenkins_slave" {
+  source                 = "./modules/instance"
+  ec2_instance_type      = var.ec2_instance_type
+  subnet_id              = module.network.public-subnet-id
+  vpc_security_group_ids = [module.network.slave-sg-id]
+  key_name               = aws_key_pair.jenkins_ssh_key.key_name
+
+  name         = "slave"
   project_name = var.project_name
   env          = var.env
   tags         = var.tags

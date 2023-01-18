@@ -4,7 +4,8 @@ data "template_file" "ansible_inventory" {
   template = file("./templates/hosts.tpl")
 
   vars = {
-    jenkins_instance_dns = module.jenkins_server.aws-jenkins-instance-public-dns
+    jenkins_master_dns = module.jenkins_master.aws-instance-public-dns
+    jenkins_slave_dns  = module.jenkins_slave.aws-instance-public-dns
   }
 }
 
