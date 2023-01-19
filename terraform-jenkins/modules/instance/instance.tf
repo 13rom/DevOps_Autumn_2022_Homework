@@ -1,5 +1,6 @@
 variable "key_name" {}
 variable "subnet_id" {}
+variable "private_ip" {} // TODO: make this automatic
 variable "vpc_security_group_ids" {}
 variable "ec2_instance_type" {}
 
@@ -27,6 +28,7 @@ resource "aws_instance" "jenkins_instance" {
 
   key_name               = var.key_name
   subnet_id              = var.subnet_id
+  private_ip             = var.private_ip
   vpc_security_group_ids = var.vpc_security_group_ids
 
   tags = merge(var.tags, tomap({

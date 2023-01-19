@@ -55,6 +55,7 @@ module "jenkins_master" {
   source                 = "./modules/instance"
   ec2_instance_type      = var.ec2_instance_type
   subnet_id              = module.network.public-subnet-id
+  private_ip             = "10.0.10.5"
   vpc_security_group_ids = [module.network.master-sg-id]
   key_name               = aws_key_pair.jenkins_ssh_key.key_name
 
@@ -68,6 +69,7 @@ module "jenkins_slave" {
   source                 = "./modules/instance"
   ec2_instance_type      = var.ec2_instance_type
   subnet_id              = module.network.public-subnet-id
+  private_ip             = "10.0.10.15"
   vpc_security_group_ids = [module.network.slave-sg-id]
   key_name               = aws_key_pair.jenkins_ssh_key.key_name
 
