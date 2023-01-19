@@ -17,8 +17,10 @@ jenkins@jenkins:~$ ssh-keyscan github.com >> ~/.ssh/known_hosts
 ```
 
 ## Tutorials
-[Assign a role to jenkins instance](https://www.youtube.com/watch?v=Qlj-xGx9hHg)
-[Add slaves with plugin](https://faun.pub/10-steps-to-deploy-and-configure-jenkins-on-aws-with-terraform-26e641e90ae)
+* [Assign a role to jenkins instance](https://www.youtube.com/watch?v=Qlj-xGx9hHg)
+* [Add slaves with plugin](https://faun.pub/10-steps-to-deploy-and-configure-jenkins-on-aws-with-terraform-26e641e90ae)
+* [[ AWS 23 ] Launch AWS EC2 instances as Jenkins Slaves using EC2 plugin](https://www.youtube.com/watch?v=dAa3u39RYpM) - Launch EC2 as jenkins slave with role
+* [How To Use Ansible with Terraform for Configuration Management](https://www.digitalocean.com/community/tutorials/how-to-use-ansible-with-terraform-for-configuration-management) - Automatic Ansible start
 
 
 Plan:
