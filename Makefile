@@ -1,10 +1,11 @@
-ADDRESS := $(shell terraform output -raw aws-jenkins-instance-public-dns)
+MASTERADDR = $(shell terraform output -raw aws-jenkins-master-instance-public-dns)
+SLAVEADDR = $(shell terraform output -raw aws-jenkins-slave-instance-public-dns)
 ANSIBLE_DIR := ./ansible-jenkins
 BACKEND_DIR := ./terraform-backend
 TERRAFORM_DIR := ./terraform-jenkins
 SSH_DIR := ./.ssh
 
-everything : backend-init backend-plan backend-apply init plan apply show-dns connect ping roles-install provision
+everything : output backend-init backend-plan backend-apply init plan apply show-dns connect-master connect-slave ping roles-install provision-master provision-slave
 .PHONY : everything
 
 backend-init:
@@ -25,12 +26,21 @@ plan:
 apply:
 	cd ${TERRAFORM_DIR}; terraform apply
 
+output:
+	cd ${TERRAFORM_DIR}; terraform output
+
 show-dns:
 	cd ${TERRAFORM_DIR}; \
-	terraform output -raw aws-jenkins-instance-public-dns
+	echo "Master Node:"; \
+	terraform output -raw aws-jenkins-master-instance-public-dns; \
+	echo "Slave Node:"; \
+	terraform output -raw aws-jenkins-slave-instance-public-dns
 
-connect:
-	ssh -i ${SSH_DIR}/jenkins_rsa ec2-user@${ADDRESS}
+connect-master:
+	ssh -i ${SSH_DIR}/jenkins_rsa ec2-user@${MASTERADDR}
+
+connect-slave:
+	ssh -i ${SSH_DIR}/jenkins_rsa ec2-user@${SLAVEADDR}
 
 ping:
 	cd ${ANSIBLE_DIR}; ansible jenkins -m ping
@@ -38,5 +48,8 @@ ping:
 roles-install:
 	cd ${ANSIBLE_DIR}; ansible-galaxy install -r ./requirements.yml -p ./roles/
 
-provision:
-	cd ${ANSIBLE_DIR}; ansible-playbook ./provision-jenkins.yml
+provision-master:
+	cd ${ANSIBLE_DIR}; ansible-playbook ./provision-master.yml
+
+provision-slave:
+	cd ${ANSIBLE_DIR}; ansible-playbook ./provision-slave.yml
