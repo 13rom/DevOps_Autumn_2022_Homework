@@ -1,31 +1,55 @@
 ---
-- hosts: "{{ passed_in_hosts }}"
+- name: Deploy Jenkins Slave node
+  hosts: jenkins-slave
   become: yes
   remote_user: ec2-user
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.7
+
   tasks:
-    - name: Generate SSH Keypair
-      openssh_keypair:
-        path: /home/ec2-user/.ssh/id_rsa
-        type: rsa
-        size: 2048
-        group: ec2-user
-        owner: ec2-user
+    # - name: Generate SSH Keypair
+    #   openssh_keypair:
+    #     path: /home/ec2-user/.ssh/id_rsa
+    #     type: rsa
+    #     size: 2048
+    #     group: ec2-user
+    #     owner: ec2-user
     
-    - name: Add own key to authorized_keys file
-      shell: "cat /home/ec2-user/.ssh/id_rsa.pub >> /home/ec2-user/.ssh/authorized_keys && chmod 600 /home/ec2-user/.ssh/authorized_keys"
+    # - name: Add own key to authorized_keys file
+    #   shell: "cat /home/ec2-user/.ssh/id_rsa.pub >> /home/ec2-user/.ssh/authorized_keys && chmod 600 /home/ec2-user/.ssh/authorized_keys"
+
+    - name: Create .ssh directory
+      file:
+        path: /home/ec2-user/.ssh
+        state: directory
+        mode: '0700'
+
+    - name: Copy SSH private key to worker
+      copy:
+        src: ../.ssh/jenkins_rsa
+        dest: /home/ec2-user/.ssh/jenkins_rsa
+        owner: ec2-user
+        group: ec2-user
+        mode: '0600'
+
+    - name: Add public key to authorized_keys file
+      authorized_key:
+        user: ec2-user
+        key: "{{ lookup('file', '../.ssh/jenkins_rsa.pub') }}"
 
     - name: Copy over Jenkins Worker Node creation payload xml
       vars: 
         ipv4: "{{ ansible_default_ipv4.address }}"
       template:
-        src: node.j2
+        src: templates/node.j2
         dest: /home/ec2-user/node.xml
         owner: ec2-user
         mode: '0644'
 
-    - name: Read generated private key id_rsa
+    - name: Read private key id_rsa
       slurp:
-        src: /home/ec2-user/.ssh/id_rsa
+        src: /home/ec2-user/.ssh/jenkins_rsa
       register: pkey
 
     - name: Copy over creds.xml and create Jenkins credential
@@ -33,7 +57,7 @@
         priv_key: "{{ pkey['content'] | b64decode }}"
         ipv4: "{{ ansible_default_ipv4.address }}"
       template:
-        src: cred-privkey.j2
+        src: templates/cred-privkey.j2
         dest: /home/ec2-user/creds.xml
 
     - name: install dependencies
@@ -42,7 +66,7 @@
       vars:
         package:
         - wget
-        - java-1.8.0-openjdk-devel
+        - java-11-amazon-corretto-headless
         - git
    
     - name: Get Jenkins CLI jar file
@@ -67,7 +91,7 @@
         
     - name: Place Jenkins Auth file
       copy:
-        src: jenkins_auth
+        src: templates/jenkins_auth
         dest: /home/ec2-user/
         owner: ec2-user
         mode: '0600'
