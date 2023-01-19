@@ -48,7 +48,7 @@ module "network" {
 
 resource "aws_key_pair" "jenkins_ssh_key" {
   key_name   = "jenkins-ssh-key"
-  public_key = var.public_key
+  public_key = file("../.ssh/jenkins_rsa.pub")
 }
 
 module "jenkins_master" {

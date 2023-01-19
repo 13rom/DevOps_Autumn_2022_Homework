@@ -14,11 +14,11 @@ variable "public_subnet_cidr_block" {
   default     = "10.0.10.0/24"
 }
 
-variable "private_subnet_cidr_block" {
-  description = "CIDR block for private subnet"
-  type        = string
-  default     = "10.0.20.0/24"
-}
+# variable "private_subnet_cidr_block" {
+#   description = "CIDR block for private subnet"
+#   type        = string
+#   default     = "10.0.20.0/24"
+# }
 
 variable "my_ip" {
   description = "Your IP address"
@@ -27,10 +27,10 @@ variable "my_ip" {
   default     = "0.0.0.0/0"
 }
 
-variable "public_key" {
-  description = "Your machine public SSH key"
-  type        = string
-}
+# variable "public_key" {
+#   description = "Your machine public SSH key"
+#   type        = string
+# }
 
 variable "ec2_instance_type" {
   description = "Preferred EC2 instance type"
