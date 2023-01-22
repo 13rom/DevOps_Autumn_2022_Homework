@@ -5,7 +5,8 @@ BACKEND_DIR := ./terraform-backend
 TERRAFORM_DIR := ./terraform-jenkins
 SSH_DIR := ./.ssh
 
-everything : output backend-init backend-plan backend-apply init plan apply show-dns connect-master connect-slave ping roles-install provision-master provision-slave
+everything : deploy output backend-init backend-plan backend-apply init plan apply show-dns connect-master connect-slave ping roles-install provision-master provision-slave
+deploy: apply provision-master provision-slave
 .PHONY : everything
 
 backend-init:
