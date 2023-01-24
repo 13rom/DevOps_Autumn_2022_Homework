@@ -22,6 +22,7 @@
       - ec2
       - ssh-slaves
       - ssh-agent
+      - docker-workflow
 
   roles:
     # - geerlingguy.firewall

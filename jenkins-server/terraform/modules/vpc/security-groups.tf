@@ -5,7 +5,7 @@ resource "aws_security_group" "jenkins_master_sg" {
 
 
   dynamic "ingress" {
-    for_each = ["80", "443", "8080"]
+    for_each = ["80", "443", "8080", "50000"]
     content {
       from_port   = ingress.value
       to_port     = ingress.value
@@ -38,6 +38,13 @@ resource "aws_security_group" "jenkins_slave_sg" {
   name        = "jenkins-slave-sg-${var.env}"
   description = "Allow Jenkins master subnet access and all egress traffic"
   vpc_id      = aws_vpc.jenkins_vpc.id
+
+  ingress {
+    from_port   = 50000
+    to_port     = 50000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] // TODO: Restrict to jenkins master public subnet CIDR
+  }
 
   ingress {
     from_port   = 22

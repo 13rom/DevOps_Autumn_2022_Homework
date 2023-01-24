@@ -24,7 +24,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket  = "terraform-state-mirom-jenkins-dev"
-    key     = "terraform-jenkins/terraform.tfstate"
+    key     = "jenkins-server/terraform/terraform.tfstate"
     region  = "eu-central-1"
     encrypt = true
     profile = "jenkins"

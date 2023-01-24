@@ -3,7 +3,7 @@ https://betterprogramming.pub/provisioning-a-jenkins-server-on-aws-using-terrafo
 
 ## Create terraform folder initial structure
 ```bash
-mkdir -p terraform-jenkins/modules/{compute,security_group,vpc} && cd terraform-jenkins && touch main.tf outputs.tf secrets.tfvars && cd modules/compute && touch main.tf outputs.tf install_jenkins.sh && cd ../security_group && touch main.tf outputs.tf && cd ../vpc && touch main.tf outputs.tf
+mkdir -p terraform/modules/{compute,security_group,vpc} && cd terraform && touch main.tf outputs.tf secrets.tfvars && cd modules/compute && touch main.tf outputs.tf install_jenkins.sh && cd ../security_group && touch main.tf outputs.tf && cd ../vpc && touch main.tf outputs.tf
 ```
 
 ## Install Ansible roles locally

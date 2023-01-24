@@ -1,12 +1,12 @@
 MASTERADDR = $(shell terraform output -raw aws-jenkins-master-instance-public-dns)
 SLAVEADDR = $(shell terraform output -raw aws-jenkins-slave-instance-public-dns)
-ANSIBLE_DIR := ./ansible-jenkins
+ANSIBLE_DIR := ./ansible
 BACKEND_DIR := ./terraform-backend
-TERRAFORM_DIR := ./terraform-jenkins
+TERRAFORM_DIR := ./terraform
 SSH_DIR := ./.ssh
 
 everything : deploy output backend-init backend-plan backend-apply init plan apply show-dns connect-master connect-slave ping roles-install provision-master provision-slave
-deploy: apply provision-master provision-slave
+deploy: apply provision-master provision-slave output
 .PHONY : everything
 
 backend-init:

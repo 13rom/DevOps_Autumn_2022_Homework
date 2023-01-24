@@ -11,5 +11,5 @@ data "template_file" "ansible_inventory" {
 
 resource "local_file" "save_ansible_inventory" {
   content  = data.template_file.ansible_inventory.rendered
-  filename = "../ansible-jenkins/hosts"
+  filename = "../ansible/hosts"
 }
