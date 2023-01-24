@@ -1,0 +1,12 @@
+---
+- name: Upload jenkins dir to server 
+  hosts: jenkins
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.7
+
+  tasks:
+    - name: Push /var/lib/jenkins from local machine to remote host
+      ansible.posix.synchronize:
+        src: ../templates/remote/
+        dest: /var/lib/jenkins

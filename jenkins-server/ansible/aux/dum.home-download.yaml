@@ -10,4 +10,4 @@
       ansible.posix.synchronize:
         mode: pull
         src: /var/lib/jenkins
-        dest: ./templates/remote/
+        dest: ../templates/remote/
