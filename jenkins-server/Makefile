@@ -1,7 +1,7 @@
 MASTERADDR = $(shell terraform output -raw aws-jenkins-master-instance-public-dns)
 SLAVEADDR = $(shell terraform output -raw aws-jenkins-slave-instance-public-dns)
 ANSIBLE_DIR := ./ansible
-BACKEND_DIR := ./terraform-backend
+BACKEND_DIR := ./terraform/backend
 TERRAFORM_DIR := ./terraform
 SSH_DIR := ./.ssh
 
