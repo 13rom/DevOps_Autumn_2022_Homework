@@ -1,12 +1,35 @@
 ---
 - name: Upload jenkins dir to server 
-  hosts: jenkins
+  hosts: master
 
   vars:
     ansible_python_interpreter: /usr/bin/python3.7
 
   tasks:
+    - name: Temporarily Stop Jenkins
+      service: 
+        name: jenkins 
+        state: stopped
+
+    - name: Delete Jenkins default dir
+      file:
+        state: absent
+        path: /var/lib/jenkins
+    
     - name: Push /var/lib/jenkins from local machine to remote host
       ansible.posix.synchronize:
-        src: ../templates/remote/
+        src: ../templates/remote/jenkins/
         dest: /var/lib/jenkins
+         
+    - name: Restore jenkins user ownership on /var/lib/jenkins
+      file:
+        path: /var/lib/jenkins
+        state: directory
+        recurse: yes
+        owner: jenkins
+
+    - name: Start Jenkins
+      service:
+        name: jenkins
+        state: started
+        enabled: yes

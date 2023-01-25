@@ -19,6 +19,14 @@
     # - name: Add own key to authorized_keys file
     #   shell: "cat /home/ec2-user/.ssh/id_rsa.pub >> /home/ec2-user/.ssh/authorized_keys && chmod 600 /home/ec2-user/.ssh/authorized_keys"
 
+    - name: Wait for EC2 instance to become available
+      wait_for_connection:
+        timeout: 300
+
+    - name: Set server hostname
+      ansible.builtin.hostname:
+        name: slave
+
     - name: Create .ssh directory
       file:
         path: /home/ec2-user/.ssh
@@ -68,7 +76,27 @@
         - wget
         - java-11-amazon-corretto-headless
         - git
-   
+        - python3-pip
+        - docker
+    
+    - name: Add jenkins user to Docker group
+      user:
+        name: jenkins
+        groups: docker
+        append: yes
+      
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+        state: present
+        executable: pip3
+      
+    - name: Restart Docker service
+      service:
+        name: docker
+        state: restarted
+        enabled: yes
+
     - name: Get Jenkins CLI jar file
       vars:
         master: "{{ master_ip }}"
@@ -96,12 +124,12 @@
         owner: ec2-user
         mode: '0600'
 
-    - name: Create Jenkins Credential
-      vars:
-        master: "{{ master_ip }}"
-      shell: "cat /home/ec2-user/creds.xml | java -jar /home/ec2-user/jenkins-cli.jar -auth @/home/ec2-user/jenkins_auth -s http://{{master}}:8080 create-credentials-by-xml system::system::jenkins _"
+    # - name: Create Jenkins Credential
+    #   vars:
+    #     master: "{{ master_ip }}"
+    #   shell: "cat /home/ec2-user/creds.xml | java -jar /home/ec2-user/jenkins-cli.jar -auth @/home/ec2-user/jenkins_auth -s http://{{master}}:8080 create-credentials-by-xml system::system::jenkins _"
 
-    - name: Register node as worker
-      vars:
-        master: "{{ master_ip }}"
-      shell: 'cat /home/ec2-user/node.xml | java -jar /home/ec2-user/jenkins-cli.jar -auth @/home/ec2-user/jenkins_auth -s http://{{ master }}:8080 create-node'
+    # - name: Register node as worker
+    #   vars:
+    #     master: "{{ master_ip }}"
+    #   shell: 'cat /home/ec2-user/node.xml | java -jar /home/ec2-user/jenkins-cli.jar -auth @/home/ec2-user/jenkins_auth -s http://{{ master }}:8080 create-node'

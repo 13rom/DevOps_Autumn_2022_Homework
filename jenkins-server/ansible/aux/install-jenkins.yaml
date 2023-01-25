@@ -1,8 +1,8 @@
 ---
-- hosts: "{{ passed_in_hosts }}"
-  become: yes
-  remote_user: ec2-user
-  become_user: root
+- name: Install Jenkins master server
+#- hosts: "{{ passed_in_hosts }}"
+  hosts: master
+
   tasks:
     - name: install dependencies
       yum:
@@ -11,7 +11,7 @@
       vars:
         package:
         - wget
-        - java-1.8.0-openjdk-devel
+        - java-11-amazon-corretto-headless
         - git
       
     - name: clone repo
