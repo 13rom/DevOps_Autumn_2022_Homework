@@ -47,10 +47,10 @@ ping:
 	cd ${ANSIBLE_DIR}; ansible jenkins -m ping
 
 roles-install:
-	cd ${ANSIBLE_DIR}; ansible-galaxy install -r ./requirements.yml -p ./roles/
+	cd ${ANSIBLE_DIR}; ansible-galaxy install -r ./requirements.yaml -p ./roles/
 
 provision-master:
-	cd ${ANSIBLE_DIR}; ansible-playbook ./provision-master.yml
+	cd ${ANSIBLE_DIR}; ansible-playbook ./provision-master.yaml
 
 provision-slave:
-	cd ${ANSIBLE_DIR}; ansible-playbook ./provision-slave.yml
+	cd ${ANSIBLE_DIR}; ansible-playbook ./provision-slave.yaml
