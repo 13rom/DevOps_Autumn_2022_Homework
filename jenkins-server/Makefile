@@ -5,7 +5,8 @@ BACKEND_DIR := ./terraform/backend
 TERRAFORM_DIR := ./terraform
 SSH_DIR := ./.ssh
 
-PHONY_TARGETS = deploy backend backend-init backend-plan backend-apply backend-output \
+PHONY_TARGETS = deploy destroy \
+				backend backend-init backend-plan backend-apply backend-output \
 				jenkins jenkins-init jenkins-plan jenkins-apply jenkins-output jenkins-show-dns \
 				provision ping roles-install provision-master provision-slave \
 				connect-master connect-slave connect-webserver
@@ -14,6 +15,7 @@ PHONY_TARGETS = deploy backend backend-init backend-plan backend-apply backend-o
 
 #### Main target ##############################################################
 deploy: jenkins-apply provision jenkins-output
+destroy: jenkins-destroy
 
 
 #### Terraform Backend initialization #########################################
@@ -46,6 +48,10 @@ jenkins-apply:
 
 jenkins-output:
 	cd ${TERRAFORM_DIR}; terraform output
+
+jenkins-destroy:
+	cd ${TERRAFORM_DIR}; terraform destroy
+
 
 jenkins-show-dns:
 	cd ${TERRAFORM_DIR}; \
