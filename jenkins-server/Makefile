@@ -85,4 +85,4 @@ connect-slave:
 	ssh -i ${SSH_DIR}/jenkins_rsa ec2-user@${SLAVEADDR}
 
 connect-webserver:
-	ssh -i ${SSH_DIR}/jenkins_rsa ubuntu@$webserver.server.cx.ua
+	ssh -i ${SSH_DIR}/jenkins_rsa ubuntu@webserver.server.cx.ua
