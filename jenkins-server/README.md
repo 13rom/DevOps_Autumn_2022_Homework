@@ -11,6 +11,11 @@ mkdir -p terraform/modules/{compute,security_group,vpc} && cd terraform && touch
 ansible-galaxy install -r requirements.yml -p ./roles/
 ```
 
+## Create an RSA PEM key (esp. for publish Over SSH)
+```
+ssh-keygen -t rsa -C "jenkins" -m PEM -P "" -f .ssh/jenkins_rsa
+```
+
 ## Add github to jenkins known hosts
 ```bash
 jenkins@jenkins:~$ ssh-keyscan github.com >> ~/.ssh/known_hosts
@@ -34,7 +39,7 @@ Plan:
     * create security group
     * add key pair
     * create instance
-* TODO: Assign AIM role to master instance
+* TODO: Assign IAM role to master instance
 * TODO: Create Jenkins agent node
 * Provision master
     * enable jenkins user
