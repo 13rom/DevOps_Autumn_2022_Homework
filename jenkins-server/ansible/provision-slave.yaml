@@ -78,6 +78,12 @@
         - git
         - python3-pip
         - docker
+
+    - name: Install Ansible using pip
+      ansible.builtin.pip:
+        name: ansible
+        state: present
+        executable: pip3
     
     - name: Add ec2-user to Docker group
       user:
@@ -86,7 +92,7 @@
         append: yes
       
     - name: Install Docker Compose
-      pip:
+      ansible.builtin.pip:
         name: docker-compose
         state: present
         executable: pip3
