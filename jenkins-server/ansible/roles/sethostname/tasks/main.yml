@@ -1,0 +1,24 @@
+---
+# tasks file for sethostname
+- name: Hostname | Setting up hostname
+  ansible.builtin.hostname:
+    name: "{{ new_hostname }}"
+  register: hostname_result
+
+- name: Hostname | Save hostname to /etc/hosts
+  ansible.builtin.lineinfile:
+    dest: /etc/hosts
+    line: "{{ hostname_result.ansible_facts.ansible_default_ipv4.address }} {{ new_hostname }}"
+  when: hostname_result.changed
+
+- name: Hostname | Save hostname to /etc/hostname
+  ansible.builtin.lineinfile:
+    dest: /etc/hostname
+    line: "{{ new_hostname }}"
+  when: hostname_result.changed
+
+# - name: Hostname | Restart network service
+#   ansible.builtin.service:
+#     name: network
+#     state: restarted
+#   when: hostname_result.changed

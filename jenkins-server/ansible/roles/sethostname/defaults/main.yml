@@ -1,0 +1,6 @@
+---
+# The hostname to set. By default whatever the inventory is set to.
+new_hostname: "{{ inventory_hostname_short }}"
+
+# Should the machine be rebooted when the hostname is changed?
+hostname_reboot: no
