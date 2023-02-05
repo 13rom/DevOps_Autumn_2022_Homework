@@ -1,0 +1,27 @@
+---
+# tasks file for jenkins-install
+- name: Jenkins | Setup Jenkins Repo
+  get_url:
+    url: https://pkg.jenkins.io/redhat/jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+
+- name: Jenkins | Import Jenkins Repo GPG key
+  rpm_key:
+    state: present
+    key: https://pkg.jenkins.io/redhat/jenkins.io.key
+
+- name: Jenkins | Install Jenkins
+  yum:
+    name: jenkins
+    state: present
+
+- name: Jenkins | Start Jenkins
+  service:
+    name: jenkins
+    state: started
+    enabled: yes
+
+- name: Jenkins | Wait for Jenkins to start
+  wait_for:
+    port: 8080
+    timeout: 300
