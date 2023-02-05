@@ -1,0 +1,39 @@
+---
+# tasks file for jenkins-home-setup
+- name: Jenkins | Temporarily Stop Jenkins
+  service:
+    name: jenkins
+    state: stopped
+
+- name: Jenkins | Enable jenkins user with SSH
+  user:
+    name: jenkins
+    shell: /bin/bash
+
+- name: Jenkins | Delete Jenkins default dir
+  file:
+    state: absent
+    path: "{{ jenkins_home_path }}"
+
+- name: Jenkins | Push jenkins dir from local machine to remote host
+  ansible.posix.synchronize:
+    src: "{{ jenkins_home_backup_path }}"
+    dest: "{{ jenkins_home_path }}"
+
+- name: Jenkins | Restore jenkins user ownership on /var/lib/jenkins
+  file:
+    path: "{{ jenkins_home_path }}"
+    state: directory
+    recurse: yes
+    owner: jenkins
+
+- name: Jenkins | Start Jenkins
+  service:
+    name: jenkins
+    state: started
+    enabled: yes
+
+- name: Jenkins | Wait for Jenkins to start
+  wait_for:
+    port: 8080
+    timeout: 300
