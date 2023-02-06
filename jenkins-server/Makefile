@@ -9,7 +9,7 @@ PHONY_TARGETS = deploy destroy \
 				backend backend-init backend-plan backend-apply backend-output \
 				jenkins jenkins-init jenkins-plan jenkins-apply jenkins-output jenkins-show-dns \
 				provision ping roles-install provision-master provision-slave \
-				connect-master connect-slave connect-webserver
+				connect-master connect-slave connect-webserver monitor
 .PHONY: $(PHONY_TARGETS)
 
 
@@ -86,3 +86,6 @@ connect-slave:
 
 connect-webserver:
 	ssh -i ${SSH_DIR}/jenkins_rsa ubuntu@webserver.server.cx.ua
+
+monitor:
+	watch -n 3 -d curl -s webserver.server.cx.ua
