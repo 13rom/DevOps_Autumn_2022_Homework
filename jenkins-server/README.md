@@ -1,50 +1,79 @@
-## Tutorial URL
-https://betterprogramming.pub/provisioning-a-jenkins-server-on-aws-using-terraform-4cd1351b5d5f
+# Jenkins CI/CD project
+> TODO: Assign IAM role to master instance
 
-## Create terraform folder initial structure
+> TODO: Save Jenkins home folder backup to S3
+
+## Project description
+### Infrastructure
+* Control Unit (Laptop)
+    - `git`, `terraform`, `ansible`
+* Jenkins **Master** Node (AWS EC2 instance)
+    - GitHub, DockerHub, SSH credentials
+* Jenkins **Slave** Node (AWS EC2 instance)
+    - `git`, `ansible`, `docker`
+* **Webserver** (Oracle Cloud Compute Instance)
+    - `docker`, `docker compose`, `docker swarm`
+* GitHub private repository
+    - **demo webapp** source code
+    - **Jenkinsfile**
+* DockerHub private repository
+    - **demo webapp** docker image
+
+## Project stages
+### Jenkins Server deployment
+1. Control Unit - `terraform`
+    * Deploy AWS S3 Bucket for Terraform remote state
+    * Deploy AWS VPC with public subnet
+    * Set up Security groups for Jenkins nodes
+    * Deploy Jenkins Master and Slave nodes
+    * ??? Create GitHub Webhook for Jenkins CI/CD project
+
+2. Control Unit - `ansible`
+    * Provision Jenkins Master Node
+    * Provision Jenkins Slave Node and connect it to Master
+
+
+### Demo Webapp Deployment
+1. Jenkins Master - Build Start
+    * Chekout **demo webapp** repository
+    * Get **Jenkinsfile** from repo
+    * Execute **Jenkinsfile** instructions on **Slave** Node
+
+1. Jenkins Slave - Build Execution
+    * Checkout **demo webapp** repository
+    * Get **demo webapp** source code from repository
+    * Get Multistage **Dockerfile** from repository
+    * Build docker image, push to **DockerHub**
+
+1. Jenkins Slave - Webapp Deploy
+    * Get ansible **playbook** from repository
+    * Get **docker compose** file from repository
+    * Run ansible playbook on **webserver**
+
+1. Webserver - Ansible playbook
+    * Get **docker compose** file from Jenkins Slave
+    * Create/update docker **stack**
+
+
+
+---
+## Notes
+#### Create terraform folder initial structure
 ```bash
 mkdir -p terraform/modules/{compute,security_group,vpc} && cd terraform && touch main.tf outputs.tf secrets.tfvars && cd modules/compute && touch main.tf outputs.tf install_jenkins.sh && cd ../security_group && touch main.tf outputs.tf && cd ../vpc && touch main.tf outputs.tf
 ```
 
-## Install Ansible roles locally
+#### Install Ansible roles locally
 ```bash
 ansible-galaxy install -r requirements.yml -p ./roles/
 ```
 
-## Create an RSA PEM key (esp. for publish Over SSH)
+#### Create an RSA PEM key (esp. for publish Over SSH)
 ```
 ssh-keygen -t rsa -C "jenkins" -m PEM -P "" -f .ssh/jenkins_rsa
 ```
 
-## Add github to jenkins known hosts
+#### Add github to jenkins known hosts
 ```bash
 jenkins@jenkins:~$ ssh-keyscan github.com >> ~/.ssh/known_hosts
 ```
-
-## Tutorials
-* [Assign a role to jenkins instance](https://www.youtube.com/watch?v=Qlj-xGx9hHg)
-* [Add slaves with plugin](https://faun.pub/10-steps-to-deploy-and-configure-jenkins-on-aws-with-terraform-26e641e90ae)
-* [[ AWS 23 ] Launch AWS EC2 instances as Jenkins Slaves using EC2 plugin](https://www.youtube.com/watch?v=dAa3u39RYpM) - Launch EC2 as jenkins slave with role
-* [How To Use Ansible with Terraform for Configuration Management](https://www.digitalocean.com/community/tutorials/how-to-use-ansible-with-terraform-for-configuration-management) - Automatic Ansible start
-
-
-Plan:
-* Create VPC
-    * add public subnet
-    * add internet gateway
-    * add route table (CIDR to GW)
-    * associate rt with subnet
-* Create Jenkins master instance
-    * get AMI
-    * create security group
-    * add key pair
-    * create instance
-* TODO: Assign IAM role to master instance
-* TODO: Create Jenkins agent node
-* Provision master
-    * enable jenkins user
-    * install jenkins software
-    * install additional software
-    * TODO: create key pair
-    * TODO: set github credentials
-    * upload jenkins home folder
