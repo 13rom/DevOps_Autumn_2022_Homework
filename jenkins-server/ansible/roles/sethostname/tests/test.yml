@@ -1,0 +1,7 @@
+---
+- name: Set Hostname
+  hosts: localhost
+  remote_user: root
+  roles:
+    - role: sethostname
+      new_hostname: mynewhostname

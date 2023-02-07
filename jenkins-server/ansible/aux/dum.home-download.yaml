@@ -1,0 +1,13 @@
+---
+- name: Download remote jenkins dir
+  hosts: jenkins
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.7
+
+  tasks:
+    - name: Pull /var/lib/jenkins from remote host
+      ansible.posix.synchronize:
+        mode: pull
+        src: /var/lib/jenkins
+        dest: ../templates/remote/

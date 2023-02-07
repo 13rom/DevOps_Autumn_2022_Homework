@@ -1,0 +1,63 @@
+---
+- name: Deploy Jenkins Server
+  hosts: jenkins
+
+  vars:
+    jenkins_admin_password: tustan
+    java_packages: java-11-amazon-corretto-headless
+    ansible_install_method: pip
+    ansible_python_interpreter: /usr/bin/python3.7
+    firewall_allowed_tcp_ports:
+      - "22"
+      - "80"
+      - "8080"
+    jenkins_plugins:
+      - ansicolor
+      - publish-over-ssh
+      - git
+      - github
+      - workflow-aggregator
+      - credentials
+      - pipeline-stage-view
+      - ec2
+      - ssh-slaves
+      - ssh-agent
+      - docker-workflow
+
+  roles:
+    # - geerlingguy.firewall
+    # - geerlingguy.pip
+    # - geerlingguy.ansible
+    # - andrewrothstein.terraform
+    # - geerlingguy.git
+    - geerlingguy.java
+    - geerlingguy.jenkins
+
+  tasks:
+    - name: Set server hostname
+      ansible.builtin.hostname:
+        name: jenkins
+
+    - name: Enable jenkins user with SSH
+      ansible.builtin.user:
+        name: jenkins
+        shell: /bin/bash
+
+    - name: Create .ssh directory
+      file:
+        path: /var/lib/jenkins/.ssh
+        state: directory
+        mode: "0700"
+
+    - name: Copy SSH private key to server
+      copy:
+        src: ../.ssh/jenkins_rsa
+        dest: /var/lib/jenkins/.ssh/jenkins_rsa
+        owner: jenkins
+        group: jenkins
+        mode: "0600"
+
+    - name: Add own public key to authorized_keys file
+      authorized_key:
+        user: jenkins
+        key: "{{ lookup('file', '../.ssh/jenkins_rsa.pub') }}"

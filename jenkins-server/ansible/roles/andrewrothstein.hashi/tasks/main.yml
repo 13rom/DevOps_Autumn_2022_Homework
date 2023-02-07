@@ -1,0 +1,17 @@
+---
+- include_role:
+    name: andrewrothstein.unarchive-deps
+- name: resolve platform specific vars
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+      skip: true
+      paths:
+        - '{{ role_path }}/vars'
+- loop: '{{ hashi_apps | default([]) }}'
+  loop_control:
+    loop_var: hashi_app
+  include_tasks: 'app-install-{{ hashi_installer }}.yml'

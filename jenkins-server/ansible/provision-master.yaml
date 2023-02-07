@@ -1,0 +1,85 @@
+---
+- name: Deploy Jenkins master server
+#- hosts: "{{ passed_in_hosts }}"
+  hosts: master
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.7
+    jenkins_home_backup_path: ./templates/remote/jenkins/
+    jenkins_home_path: /var/lib/jenkins
+
+    # src: "{{ jenkins_home_backup_path }}"
+    # dest: "{{ jenkins_home_path }}"
+
+  tasks:
+    - name: Wait for EC2 instance to become available
+      wait_for_connection:
+        timeout: 300
+        
+    - name: Set server hostname
+      ansible.builtin.hostname:
+        name: jenkins
+      
+    - name: Install dependencies
+      yum:
+        name: "{{ package }} "
+        state: present
+      vars:
+        package:
+        - wget
+        - java-11-amazon-corretto-headless
+        - git
+
+    - name: Setup Jenkins Repo
+      get_url:
+        url: https://pkg.jenkins.io/redhat/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+    
+    - name: Import Jenkins Repo GPG key
+      rpm_key:
+        state: present
+        key: https://pkg.jenkins.io/redhat/jenkins.io.key
+ 
+    - name: Install Jenkins
+      yum:
+        name: jenkins
+        state: present
+
+    - name: Temporarily Stop Jenkins
+      service: 
+        name: jenkins 
+        state: stopped
+
+    - name: Enable jenkins user with SSH
+      user:
+        name: jenkins
+        shell: /bin/bash
+
+    - name: Delete Jenkins default dir
+      file:
+        state: absent
+        path: "{{ jenkins_home_path }}"
+
+    - name: Push jenkins dir from local machine to remote host
+      ansible.posix.synchronize:
+        src: "{{ jenkins_home_backup_path }}"
+        dest: "{{ jenkins_home_path }}"
+
+    - name: Restore jenkins user ownership on /var/lib/jenkins
+      file:
+        path: "{{ jenkins_home_path }}"
+        state: directory
+        recurse: yes
+        owner: jenkins
+
+    - name: Start Jenkins
+      service:
+        name: jenkins
+        state: started
+        enabled: yes
+    
+    - name: Wait for Jenkins to start
+      wait_for:
+        port: 8080
+        timeout: 300
+
