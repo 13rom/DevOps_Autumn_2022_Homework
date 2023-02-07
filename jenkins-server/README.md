@@ -6,7 +6,7 @@
 ## Project description
 ### Infrastructure
 * Control Unit (Laptop)
-    - `git`, `terraform`, `ansible`
+    - `make`, `git`, `terraform`, `ansible`
 * Jenkins **Master** Node (AWS EC2 instance)
     - GitHub, DockerHub, SSH credentials
 * Jenkins **Slave** Node (AWS EC2 instance)

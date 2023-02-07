@@ -11,4 +11,4 @@
 
 ## Final project
 
-* [my-awesome-project](example.com)
+* [Final Project](jenkins-server/)
