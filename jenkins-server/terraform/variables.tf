@@ -57,3 +57,22 @@ variable "tags" {
     Terraform = "true"
   }
 }
+
+
+# GitHub Webhook variables
+variable "github_repo_name" {
+  description = "Name of github repository"
+  type        = string
+}
+
+variable "github_owner" {
+  description = "Name of github repository owner"
+  type        = string
+}
+
+variable "github_repo_token" {
+  description = "Github repository security token"
+  type        = string
+}
+
+

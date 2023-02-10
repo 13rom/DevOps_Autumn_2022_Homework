@@ -5,6 +5,7 @@ log/
 *.tmp
 *.pyc
 __pycache__/
+hosts
 
 .ssh
 /.git/
