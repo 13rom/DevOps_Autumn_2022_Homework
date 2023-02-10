@@ -62,3 +62,9 @@ output "aws-jenkins-slave-instance-public-dns" {
   description = "Jenkins Server Instance Public DNS name"
   value       = module.jenkins_slave.aws-instance-public-dns
 }
+
+# Jenkins address
+output "Jenkins-Server-Address" {
+  description = "Jenkins Master Server web page address"
+  value       = "http://${module.jenkins_master.aws-instance-public-dns}:8080"
+}
