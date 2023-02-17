@@ -11,3 +11,5 @@
         mode: pull
         src: /var/lib/jenkins
         dest: ../templates/remote/
+        rsync_opts:
+          - "--exclude=%C"
