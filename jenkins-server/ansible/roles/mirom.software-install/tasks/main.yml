@@ -4,4 +4,4 @@
   package:
     name: "{{ item }}"
     state: present
-  with_items: "{{ software_list }}"
+  with_items: "{{ packages }}"

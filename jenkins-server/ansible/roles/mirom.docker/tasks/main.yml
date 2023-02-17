@@ -1,0 +1,24 @@
+---
+# pip3 should be installed beforehand
+- name: Docker | Install docker engine
+  ansible.builtin.package:
+    name: docker
+    state: present
+
+- name: Docker | Install docker compose plugin
+  ansible.builtin.pip:
+    name: docker
+    state: present
+    executable: pip3
+
+- name: Docker | Add user to Docker group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+
+- name: Docker | Restart Docker service
+  ansible.builtin.service:
+    name: docker
+    state: restarted
+    enabled: yes

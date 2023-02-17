@@ -4,7 +4,7 @@
   remote_user: root
   roles:
     - role: mirom.software-install
-      software_list:
+      packages:
         - package1
         - package2
         - package3

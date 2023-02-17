@@ -1,0 +1,7 @@
+---
+# pip3 should be installed beforehand
+- name: Ansible | Install Ansible
+  ansible.builtin.pip:
+    name: ansible
+    state: present
+    executable: pip3
