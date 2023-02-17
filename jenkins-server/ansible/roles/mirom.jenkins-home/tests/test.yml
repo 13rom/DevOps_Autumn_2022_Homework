@@ -2,6 +2,6 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - role: jenkins-home-setup
+    - role: mirom.jenkins-home
       jenkins_home_path: /var/lib/jenkins
       jenkins_home_backup_path: ./templates/remote/jenkins/

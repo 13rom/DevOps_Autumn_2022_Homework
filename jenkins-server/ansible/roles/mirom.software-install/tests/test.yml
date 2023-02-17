@@ -3,7 +3,7 @@
   become: yes
   remote_user: root
   roles:
-    - role: software-install
+    - role: mirom.software-install
       software_list:
         - package1
         - package2
